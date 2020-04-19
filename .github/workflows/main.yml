@@ -36,9 +36,9 @@ jobs:
 
     - name: deploy google gn
       env:
-        conan_api_password: ${{ conan_api_password }}
+        conan_api_password: ${{ secrets.conan_api_password }}
       run: |
         conan remote add freckled_webrtc https://api.bintray.com/conan/freckled/google-webrtc
         conan user -p "$conan_api_password" -r freckled_webrtc freckled
-        conan upload google-\* -r freckled_webrtc
+        conan upload -no recipe -r freckled_webrtc google-\*
 
