@@ -19,9 +19,10 @@ jobs:
 
     - name: install build dependencies
       run: |
-        sudo apt-get install -y lsb-release python python3-setuptools # sudo
+        sudo apt-get install -y lsb-release python python3-setuptools ninja-build # sudo
         ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl
         sudo -H pip3 install conan
+        conan profile update settings.compiler.libcxx=libstdc++11 default
 
     - name: build google gn
       run: |
@@ -32,3 +33,12 @@ jobs:
       run: |
         cd webrtc
         conan create .
+
+    - name: deploy google gn
+      env:
+        conan_api_password: ${{ conan_api_password }}
+      run: |
+        conan remote add freckled_webrtc https://api.bintray.com/conan/freckled/google-webrtc
+        conan user -p "$conan_api_password" -r freckled_webrtc freckled
+        conan upload google-\* -r freckled_webrtc
+
