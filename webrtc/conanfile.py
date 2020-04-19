@@ -28,7 +28,7 @@ class WebrtcConan(ConanFile):
         #   use_lld=false use_gold=false'
 
         args = "use_rtti=true treat_warnings_as_errors=false "
-        args += "use_sysroot=false "
+        args += "use_sysroot=false rtc_build_tools=false "
         # no tests
         args += "rtc_include_tests=false libyuv_include_tests=false "
         # no bundled libc++
