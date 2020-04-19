@@ -23,17 +23,21 @@ jobs:
           python3-wheel ninja-build # sudo
         ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl
         sudo -H pip3 install conan
-        conan profile update settings.compiler.libcxx=libstdc++11 default
+
+    - name: set up conan
+      run: |
+        conan profile new webrtc --detect
+        conan profile update settings.compiler.libcxx=libstdc++11 webrtc
 
     - name: build google gn
       run: |
         cd gn
-        conan create .
+        conan create --profile webrtc .
 
     - name: build google webrtc
       run: |
         cd webrtc
-        conan create .
+        conan create --profile webrtc .
 
     - name: deploy google gn
       env:
