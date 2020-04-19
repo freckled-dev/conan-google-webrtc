@@ -19,9 +19,9 @@ jobs:
 
     - name: install build dependencies
       run: |
-        sudo apt-get install -y lsb-release python # sudo
+        sudo apt-get install -y lsb-release python python3-setuptools # sudo
         ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl
-        sudo pip3 install conan
+        sudo -H pip3 install conan
 
     - name: build google gn
       run: |
