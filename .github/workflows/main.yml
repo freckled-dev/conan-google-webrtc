@@ -19,7 +19,7 @@ jobs:
 
     - name: install build dependencies
       run: |
-        sudo apt install -y lsb-release python # sudo
+        sudo apt-get install -y lsb-release python # sudo
         ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl
         sudo pip3 install conan
 
