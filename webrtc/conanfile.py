@@ -17,7 +17,7 @@ class WebrtcConan(ConanFile):
 
     def source(self):
         git = tools.Git(folder="webrtc")
-        git.clone("https://github.com/lileimt/WebRTC.git", "master")
+        git.clone("https://github.com/freckled-dev/google-webrtc.git", "master")
 
     def build(self):
         # gn gen out/Default --args='is_debug=true use_custom_libcxx=false
@@ -35,26 +35,25 @@ class WebrtcConan(ConanFile):
         args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
         if tools.which('ccache'):
             args += 'cc_wrapper="ccache" '
-        with tools.chdir('%s/webrtc/src' % (self.source_folder)):
+        with tools.chdir('%s/webrtc' % (self.source_folder)):
             self.run("gn gen %s --args='%s'" % (self.build_folder, args))
         with tools.chdir(self.build_folder):
             self.run('ninja')
 
     def package(self):
-        self.copy("api/*.h", dst="include", src="webrtc/src")
-        self.copy("call/*.h", dst="include", src="webrtc/src")
-        self.copy("common_types.h", dst="include", src="webrtc/src")
-        self.copy("common_video/*.h", dst="include", src="webrtc/src")
-        self.copy("logging/*.h", dst="include", src="webrtc/src")
-        self.copy("media/*.h", dst="include", src="webrtc/src")
-        self.copy("modules/*.h", dst="include", src="webrtc/src")
-        self.copy("p2p/*.h", dst="include", src="webrtc/src")
-        self.copy("rtc_base/*.h", dst="include", src="webrtc/src")
-        self.copy("system_wrappers/*.h", dst="include", src="webrtc/src")
+        self.copy("api/*.h", dst="include", src="webrtc")
+        self.copy("call/*.h", dst="include", src="webrtc")
+        self.copy("common_types.h", dst="include", src="webrtc")
+        self.copy("common_video/*.h", dst="include", src="webrtc")
+        self.copy("logging/*.h", dst="include", src="webrtc")
+        self.copy("media/*.h", dst="include", src="webrtc")
+        self.copy("modules/*.h", dst="include", src="webrtc")
+        self.copy("p2p/*.h", dst="include", src="webrtc")
+        self.copy("rtc_base/*.h", dst="include", src="webrtc")
+        self.copy("system_wrappers/*.h", dst="include", src="webrtc")
         self.copy("absl/*.h", dst="include",
-                src="webrtc/src/third_party/abseil-cpp")
+                src="webrtc/third_party/abseil-cpp")
 
-        # self.copy("*.hpp", dst="include", src="webrtc/src/api")
         self.copy("*webrtc.lib", dst="lib", keep_path=False)
         self.copy("*webrtc.dll", dst="bin", keep_path=False)
         self.copy("*libwebrtc.so", dst="lib", keep_path=False)
