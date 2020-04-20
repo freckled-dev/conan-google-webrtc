@@ -34,10 +34,15 @@ jobs:
         cd gn
         conan create --profile webrtc .
 
-    - name: build google webrtc
+    - name: build google webrtc Release
       run: |
         cd webrtc
         conan create --profile webrtc .
+
+    - name: build google webrtc Debug
+      run: |
+        cd webrtc
+        conan create --profile webrtc -s build_type=Debug .
 
     - name: deploy google gn
       env:
@@ -46,5 +51,5 @@ jobs:
         conan remote add freckled_webrtc \
           https://api.bintray.com/conan/freckled/google-webrtc
         conan user -p "$conan_api_password" -r freckled_webrtc freckled
-        conan upload -no recipe -r freckled_webrtc google-\*
+        conan upload -r freckled_webrtc google
 
