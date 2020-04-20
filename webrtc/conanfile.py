@@ -69,7 +69,7 @@ class WebrtcConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = ["webrtc"]
         self.cpp_info.system_libs = ["dl"]
-        self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX", 
+        self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX",
                 "_GLIBCXX_USE_CXX11_ABI=1"]
 
 
