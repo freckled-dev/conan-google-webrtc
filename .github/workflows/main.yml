@@ -50,7 +50,6 @@ jobs:
       run: |
         conan remote add freckled_webrtc \
           https://api.bintray.com/conan/freckled/google-webrtc
-        conan user -p "$conan_api_password" -r freckled_webrtc freckled
-        conan upload -r freckled_webrtc google-gn
-        conan upload -r freckled_webrtc google-webrtc
+        conan user -p "$conan_api_password" --remote freckled_webrtc freckled
+        conan upload --confirm --remote freckled_webrtc google-\*
 
