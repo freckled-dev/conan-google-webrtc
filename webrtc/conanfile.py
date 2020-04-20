@@ -33,8 +33,14 @@ class WebrtcConan(ConanFile):
         args += "rtc_include_tests=false libyuv_include_tests=false "
         # no bundled libc++
         args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+        build_type = self.settings.get_safe("build_type", default="Release")
+        if build_type == "Debug":
+            args += "is_debug=true "
+        else:
+            args += "is_debug=false "
         if tools.which('ccache'):
             args += 'cc_wrapper="ccache" '
+        self.output.info("args:%s" % (args))
         with tools.chdir('%s/webrtc' % (self.source_folder)):
             self.run("gn gen %s --args='%s'" % (self.build_folder, args))
         with tools.chdir(self.build_folder):
