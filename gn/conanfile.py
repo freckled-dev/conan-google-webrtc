@@ -10,7 +10,7 @@ class GnConan(ConanFile):
     url = "github.com/freckled-dev/conan-google-webrtc"
     description = "Google Gn"
     topics = ("gn", "google")
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "compiler", "arch"
 
     def source(self):
         git = tools.Git(folder="gn")
