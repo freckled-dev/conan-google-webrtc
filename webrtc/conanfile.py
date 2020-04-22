@@ -33,6 +33,11 @@ class WebrtcConan(ConanFile):
         args += "rtc_include_tests=false libyuv_include_tests=false "
         # no bundled libc++
         args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+        compiler = self.settings.compiler
+        if compiler == "gcc":
+            args += "is_clang=false use_gold=false use_lld=false "
+        else:
+            self.output.error("the compiler '%s' is not tested" % (compiler))
         build_type = self.settings.get_safe("build_type", default="Release")
         if build_type == "Debug":
             args += "is_debug=true "
@@ -69,7 +74,6 @@ class WebrtcConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = ["webrtc"]
         self.cpp_info.system_libs = ["dl"]
-        self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX",
-                "_GLIBCXX_USE_CXX11_ABI=1"]
+        self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX"]
 
 
