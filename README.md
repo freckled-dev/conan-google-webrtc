@@ -29,15 +29,6 @@ to: Control Panel → Programs → Programs and Features →
 Select the “Windows Software Development Kit” → Change → Change → 
 Check “Debugging Tools For Windows” → Change.
 
-download depot_tools. add it to the system environment.
-ensure it's first in PATH so no other pyhton exe can be found before it. \
-https://storage.googleapis.com/chrome-infra/depot_tools.zip
-verify that python comes first from depot_tools by running
-```bat
-where python
-where python3
-```
-
 because there's no pip, install conan by installer \
 https://conan.io/downloads.html
 https://dl.bintray.com/conan/installers/conan-win-64_1_24_1.exe
