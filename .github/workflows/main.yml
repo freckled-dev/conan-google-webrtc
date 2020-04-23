@@ -44,7 +44,7 @@ jobs:
         cd webrtc
         conan create --profile webrtc -s build_type=Debug .
 
-    - name: deploy google gn
+    - name: deploy to bintray
       env:
         conan_api_password: ${{ secrets.conan_api_password }}
       run: |
