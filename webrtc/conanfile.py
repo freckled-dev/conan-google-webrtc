@@ -12,7 +12,8 @@ class WebrtcConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [False]}
     default_options = {"shared": False}
-    no_copy_source = True
+    # no_copy_source = True # on windows we patch. so we can't set it
+    short_paths = True
     _webrtc_source = ""
     _depot_tools_dir = ""
 
@@ -38,6 +39,7 @@ class WebrtcConan(ConanFile):
 
     def build(self):
         self.setup_vars()
+        self._patch_runtime()
         # gn gen out/Default --args='is_debug=true use_custom_libcxx=false
         #   use_custom_libcxx_for_host=false cc_wrapper="ccache" use_rtti=true
         #   is_clang=true use_sysroot=false treat_warnings_as_errors=false
@@ -45,7 +47,8 @@ class WebrtcConan(ConanFile):
         #   clang_base_path="/usr" clang_use_chrome_plugins=false
         #   use_lld=false use_gold=false'
 
-        args = ""
+        # no bundled libc++
+        args = "use_custom_libcxx=false use_custom_libcxx_for_host=false "
         build_type = self.settings.get_safe("build_type", default="Release")
         if build_type == "Debug":
             args += "is_debug=true "
@@ -71,6 +74,19 @@ class WebrtcConan(ConanFile):
             with tools.chdir(self.build_folder):
                 self.run('ninja')
 
+    def _patch_runtime(self):
+        if self.settings.os != "Windows":
+            return
+        # https://groups.google.com/forum/#!topic/discuss-webrtc/f44XZnQDNIA
+        # https://stackoverflow.com/questions/49083754/linking-webrtc-with-qt-on-windows
+        # https://docs.conan.io/en/latest/reference/tools.html#tools-replace-in-file
+        # TODO check the actually set runtime
+        with tools.chdir(self._webrtc_source):
+            build_gn_file = os.path.join('build', 'config', 'win', 'BUILD.gn')
+            tools.replace_in_file(build_gn_file,
+                'configs = [ ":static_crt" ]',
+                'configs = [ ":dynamic_crt" ]')
+
     def setup_vars(self):
         self._depot_tools_dir = os.path.join(self.source_folder, "depot_tools")
         self.output.info("depot_tools_dir '%s'" % (self._depot_tools_dir))
@@ -83,8 +99,6 @@ class WebrtcConan(ConanFile):
     def create_linux_arguments(self):
         args = "use_rtti=true treat_warnings_as_errors=false "
         args += "use_sysroot=false "
-        # no bundled libc++
-        args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
         compiler = self.settings.compiler
         if compiler == "gcc":
             args += "is_clang=false use_gold=false use_lld=false "
@@ -117,7 +131,9 @@ class WebrtcConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = ["webrtc"]
         if self.settings.os == "Windows":
-            self.cpp_info.defines = ["WEBRTC_WINDOWS"]
+            self.cpp_info.defines = ["WEBRTC_WIN", "NOMINMAX"]
+            self.cpp_info.system_libs = ['secur32', 'winmm', 'dmoguids',
+                    'wmcodecdspuuid', 'msdmo', 'Strmiids']
         if self.settings.os == "Linux":
             self.cpp_info.system_libs = ["dl"]
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX"]
