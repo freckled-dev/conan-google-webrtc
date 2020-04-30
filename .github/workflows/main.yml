@@ -32,11 +32,6 @@ jobs:
         conan profile new webrtc --detect
         conan profile update settings.compiler.libcxx=libstdc++11 webrtc
 
-    - name: build google gn
-      run: |
-        cd gn
-        conan create --profile webrtc .
-
     - name: build google webrtc Release
       run: |
         cd webrtc
