@@ -30,7 +30,7 @@ class WebrtcConan(ConanFile):
                     self.run("gclient sync -D")
         else:
             git_depot_tools = tools.Git(folder="depot_tools")
-            git_webrtc.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
+            git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
             # optimised. much quicker and lighter (not using 10GB of disk space)
             git_webrtc = tools.Git(folder="src")
             git_webrtc.clone("https://github.com/freckled-dev/google-webrtc.git", "master")
