@@ -17,10 +17,6 @@ class WebrtcConan(ConanFile):
     _webrtc_source = ""
     _depot_tools_dir = ""
 
-    def build_requirements(self):
-        if self.settings.os != "Windows":
-            self.build_requires("google-gn/1.0")
-
     def source(self):
         self.setup_vars()
         if self.settings.os == "Windows":
@@ -33,9 +29,11 @@ class WebrtcConan(ConanFile):
                     self.run("git checkout -b m79 branch-heads/m79")
                     self.run("gclient sync -D")
         else:
-            # optimised. much quickler and lighter
-            git = tools.Git(folder="src")
-            git.clone("https://github.com/freckled-dev/google-webrtc.git", "master")
+            git_depot_tools = tools.Git(folder="depot_tools")
+            git_webrtc.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
+            # optimised. much quicker and lighter (not using 10GB of disk space)
+            git_webrtc = tools.Git(folder="src")
+            git_webrtc.clone("https://github.com/freckled-dev/google-webrtc.git", "master")
 
     def build(self):
         self.setup_vars()
@@ -64,10 +62,10 @@ class WebrtcConan(ConanFile):
             args += self.create_linux_arguments()
         call = "gn gen \"%s\" --args=\"%s\"" % (self.build_folder, args)
         self.output.info("call:%s" % (call))
-        with tools.vcvars(self.settings):
+        with tools.environment_append({"PATH": [self._depot_tools_dir]}):
             with tools.chdir(self._webrtc_source):
                 if self.settings.os == "Windows":
-                    with tools.environment_append({"PATH": [self._depot_tools_dir]}):
+                    with tools.vcvars(self.settings):
                         self.run(call)
                 else:
                     self.run(call)
