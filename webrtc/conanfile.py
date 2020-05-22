@@ -107,18 +107,7 @@ class WebrtcConan(ConanFile):
         return args
 
     def package(self):
-        self.copy("api/*.h", dst="include", src="src")
-        self.copy("call/*.h", dst="include", src="src")
-        self.copy("common_types.h", dst="include", src="src")
-        self.copy("common_video/*.h", dst="include", src="src")
-        self.copy("logging/*.h", dst="include", src="src")
-        self.copy("media/*.h", dst="include", src="src")
-        self.copy("modules/*.h", dst="include", src="src")
-        self.copy("p2p/*.h", dst="include", src="src")
-        self.copy("rtc_base/*.h", dst="include", src="src")
-        self.copy("system_wrappers/*.h", dst="include", src="src")
-        self.copy("absl/*.h", dst="include",
-                src="src/third_party/abseil-cpp")
+        self.copy("*.h", dst="include", src="src")
 
         self.copy("*webrtc.lib", dst="lib", keep_path=False)
         self.copy("*webrtc.dll", dst="bin", keep_path=False)
@@ -128,6 +117,20 @@ class WebrtcConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["webrtc"]
+        self.cpp_info.includedirs = [
+                "include",
+                "include/api",
+                "include/call",
+                "include/common_video",
+                "include/logging",
+                "include/media",
+                "include/modules",
+                "include/p2p",
+                "include/rtc_base",
+                "include/system_wrappers",
+                "include/third_party/abseil-cpp",
+                "include/third_party/boringssl/src/include",
+                ]
         if self.settings.os == "Windows":
             self.cpp_info.defines = ["WEBRTC_WIN", "NOMINMAX"]
             self.cpp_info.system_libs = ['secur32', 'winmm', 'dmoguids',
