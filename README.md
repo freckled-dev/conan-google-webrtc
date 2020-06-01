@@ -29,11 +29,25 @@ to: Control Panel → Programs → Programs and Features →
 Select the “Windows Software Development Kit” → Change → Change → 
 Check “Debugging Tools For Windows” → Change.
 
+create and set the environment variable: "DEPOT_TOOLS_WIN_TOOLCHAIN=1". Else it searches for vs2017 in googly style.
+
+You must have the version 10.0.18362 or higher Windows 10 SDK installed. This can be installed separately or by checking the appropriate box in the Visual Studio Installer. or by https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/
+
+disable Antimalware service
+
+use `cmd`. Everything else does not work. Including Power Shell.
+
 because there's no pip, install conan by installer \
 https://conan.io/downloads.html
 https://dl.bintray.com/conan/installers/conan-win-64_1_24_1.exe
 
 now ur set up. create the packages by
+
+### notes on versions
+
+v69
+- install pywin32-227 `python -m pip install pywin32` https://stackoverflow.com/questions/55551188/python-importerror-no-module-named-win32file
+Install windows 10 SDK `10.0.17*`
 
 ### tips if there're errors
 
