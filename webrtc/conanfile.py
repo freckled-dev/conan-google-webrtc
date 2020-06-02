@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 class WebrtcConan(ConanFile):
     name = "google-webrtc"
-    version = "m79"
+    version = "m83"
     license = "MIT"
     author = "Markus Lanner <contact@markus-lanner.com>"
     url = "github.com/freckled-dev/conan-google-webrtc"
@@ -29,7 +29,7 @@ class WebrtcConan(ConanFile):
             self.run("gclient")
             self.run("fetch --nohooks webrtc")
             with tools.chdir('src'):
-                self.run("git checkout -b m79 branch-heads/m79")
+                self.run("git checkout -b %s branch-heads/%s" % (version, version))
                 self.run("gclient sync -D")
 
     def build(self):
@@ -60,6 +60,9 @@ class WebrtcConan(ConanFile):
         call = "gn gen \"%s\" --args=\"%s\"" % (self.build_folder, args)
         self.output.info("call:%s" % (call))
         with tools.environment_append({"PATH": [self._depot_tools_dir]}):
+            # TODO test without. maybe they fixed it
+            self.run("python -m pip install --upgrade pywin32")
+            self.run("python3 -m pip install --upgrade pywin32")
             with tools.chdir(self._webrtc_source):
                 if self.settings.os == "Windows":
                     with tools.vcvars(self.settings):
