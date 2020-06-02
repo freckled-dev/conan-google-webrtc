@@ -53,9 +53,9 @@ class WebrtcConan(ConanFile):
         else:
             args += "is_debug=false "
         # no tests
-        args += "rtc_include_tests=false libyuv_include_tests=false "
+        # args += "rtc_include_tests=false libyuv_include_tests=false "
         # no tools
-        args += "rtc_build_tools=false "
+        # args += "rtc_build_tools=false "
         if self.settings.os == "Windows":
             args += self.create_windows_arguments()
         if self.settings.os == "Linux":
