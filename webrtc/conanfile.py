@@ -22,18 +22,15 @@ class WebrtcConan(ConanFile):
         if self.settings.os == "Windows":
             tools.download("https://storage.googleapis.com/chrome-infra/depot_tools.zip", "depot_tools.zip")
             tools.unzip("depot_tools.zip", destination="depot_tools")
-            with tools.environment_append({"PATH": [self._depot_tools_dir]}):
-                self.run("gclient")
-                self.run("fetch --nohooks webrtc")
-                with tools.chdir('src'):
-                    self.run("git checkout -b m79 branch-heads/m79")
-                    self.run("gclient sync -D")
         else:
             git_depot_tools = tools.Git(folder="depot_tools")
             git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
-            # optimised. much quicker and lighter (not using 10GB of disk space)
-            git_webrtc = tools.Git(folder="src")
-            git_webrtc.clone("https://github.com/freckled-dev/google-webrtc.git", "master")
+        with tools.environment_append({"PATH": [self._depot_tools_dir]}):
+            self.run("gclient")
+            self.run("fetch --nohooks webrtc")
+            with tools.chdir('src'):
+                self.run("git checkout -b m79 branch-heads/m79")
+                self.run("gclient sync -D")
 
     def build(self):
         self.setup_vars()
