@@ -17,7 +17,7 @@ class WebrtcConan(ConanFile):
     options = {"shared": [False]}
     default_options = {"shared": False}
     # no_copy_source = True # on windows we patch. so we can't set it
-    # short_paths = True
+    # short_paths = True # it's a must. depot_tools checkout otherwise. Even if long paths are activated (win10 and msys)
     _webrtc_source = ""
     _depot_tools_dir = ""
 
@@ -30,6 +30,8 @@ class WebrtcConan(ConanFile):
             git_depot_tools = tools.Git(folder="depot_tools")
             git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
         with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
+            if self.settings.os == "Windows":
+                self.run("git config --system core.longpaths true")
             self.run("gclient")
             self.run("fetch --nohooks webrtc")
             with tools.chdir('src'):

@@ -1,10 +1,11 @@
 variables:
   # we can't cache files outside conan, so we set conan to a source dir
   CONAN_USER_HOME: "$CI_PROJECT_DIR/.cache"
-cache:
-  key: conan
-  paths:
-    - .cache
+# use it with stonger machines. now it takes forever for doing the cache and it uses too much space.
+# cache:
+#   key: conan
+#   paths:
+#     - .cache
 
 build windows debug:
   stage: build

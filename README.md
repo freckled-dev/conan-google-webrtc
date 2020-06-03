@@ -36,6 +36,8 @@ You must have the version 10.0.18362 or higher Windows 10 SDK installed. This ca
 disable Antimalware service
 
 enable long paths https://docs.conan.io/en/latest/reference/conanfile/attributes.html#short-paths
+by using the tool `Group Policy` then `Computer Configuration > Administrative Templates > System > Filesystem > Enable Win32 long paths`.
+AND set it to msys git (git bash) `git config --system core.longpaths true`
 
 use `cmd`. Everything else does not work. Including Power Shell.
 
