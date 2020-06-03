@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"
+cd ../..
+docker build \
+  -t 'registry.gitlab.com/acof/webrtc-conan/ci/build_ubuntu:18.04' \
+  -f ci/ubuntu1804/Dockerfile \
+  .
+
+

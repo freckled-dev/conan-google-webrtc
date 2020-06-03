@@ -29,7 +29,7 @@ class WebrtcConan(ConanFile):
         else:
             git_depot_tools = tools.Git(folder="depot_tools")
             git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
-        with tools.environment_append({"PATH": [self._depot_tools_dir]}):
+        with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
             self.run("gclient")
             self.run("fetch --nohooks webrtc")
             with tools.chdir('src'):
@@ -63,7 +63,7 @@ class WebrtcConan(ConanFile):
             args += self.create_linux_arguments()
         call = "gn gen \"%s\" --args=\"%s\"" % (self.build_folder, args)
         self.output.info("call:%s" % (call))
-        with tools.environment_append({"PATH": [self._depot_tools_dir]}):
+        with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
             # TODO test without. maybe they fixed it
             if self.settings.os == "Windows":
                 self.run("python -m pip install --upgrade pywin32")
