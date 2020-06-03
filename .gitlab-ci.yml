@@ -1,0 +1,27 @@
+
+build windows debug:
+  stage: build
+  tags:
+    - windows
+    - dedicated
+  script:
+    - conan create --profile ./profiles/windows_debug ./webrtc
+    - conan remote add freckled_webrtc \
+        https://api.bintray.com/conan/freckled/google-webrtc
+    - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
+    - conan upload --all --confirm --remote freckled_webrtc google-\*
+
+build ubuntu 18.04 debug:
+  stage: build
+  image: ubuntu:18.04
+  tags:
+    - docker
+    - dedicated
+  before_script:
+    - sudo apt-get install -y lsb-release python python3-setuptools \
+        python3-wheel # sudo python3-pip
+    - ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl
+  script:
+    - conan create --profile ./profiles/ubuntu1804_debug ./webrtc
+
+

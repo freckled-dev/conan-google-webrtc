@@ -3,7 +3,11 @@ from conans import ConanFile, CMake, tools
 
 class WebrtcConan(ConanFile):
     name = "google-webrtc"
-    version = "m83"
+    # versions https://chromiumdash.appspot.com/releases?platform=Linux
+    # the version 83.0.4103.61 means v83, branch head 4103 (daily branches)
+    # https://groups.google.com/forum/#!msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ
+    version = "83"
+    _branchHead = "4103"
     license = "MIT"
     author = "Markus Lanner <contact@markus-lanner.com>"
     url = "github.com/freckled-dev/conan-google-webrtc"
@@ -29,7 +33,7 @@ class WebrtcConan(ConanFile):
             self.run("gclient")
             self.run("fetch --nohooks webrtc")
             with tools.chdir('src'):
-                self.run("git checkout -b %s branch-heads/%s" % (version, version))
+                self.run("git checkout -b %s branch-heads/%s" % (self.version, self._branchHead))
                 self.run("gclient sync -D")
 
     def build(self):
@@ -61,8 +65,9 @@ class WebrtcConan(ConanFile):
         self.output.info("call:%s" % (call))
         with tools.environment_append({"PATH": [self._depot_tools_dir]}):
             # TODO test without. maybe they fixed it
-            self.run("python -m pip install --upgrade pywin32")
-            self.run("python3 -m pip install --upgrade pywin32")
+            if self.settings.os == "Windows":
+                self.run("python -m pip install --upgrade pywin32")
+                self.run("python3 -m pip install --upgrade pywin32")
             with tools.chdir(self._webrtc_source):
                 if self.settings.os == "Windows":
                     with tools.vcvars(self.settings):
@@ -97,11 +102,11 @@ class WebrtcConan(ConanFile):
     def create_linux_arguments(self):
         args = "use_rtti=true treat_warnings_as_errors=false "
         args += "use_sysroot=false "
-        compiler = self.settings.compiler
-        if compiler == "gcc":
-            args += "is_clang=false use_gold=false use_lld=false "
-        else:
-            self.output.error("the compiler '%s' is not tested" % (compiler))
+        # compiler = self.settings.compiler
+        # if compiler == "gcc":
+        #     args += "is_clang=false use_gold=false use_lld=false "
+        # else:
+        #     self.output.error("the compiler '%s' is not tested" % (compiler))
         if tools.which('ccache'):
             args += 'cc_wrapper=\\"ccache\\" '
         return args

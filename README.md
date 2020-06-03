@@ -46,7 +46,6 @@ now ur set up. create the packages by
 ### notes on versions
 
 v69
-- install pywin32-227 `python -m pip install pywin32` https://stackoverflow.com/questions/55551188/python-importerror-no-module-named-win32file
 Install windows 10 SDK `10.0.17*`
 
 ### tips if there're errors
@@ -59,6 +58,22 @@ verify that python comes first from depot_tools by running
 ```bat
 where python
 where python3
+```
+
+no win32file https://stackoverflow.com/questions/55551188/python-importerror-no-module-named-win32file
+```
+FAILED: py_quality_assessment/apm_configs/default.json
+C:/.conan/231d67/1/depot_tools/bootstrap-3_8_0_chromium_8_bin/python/bin/python.exe src/build/toolchain/win/tool_wrapper.py recursive-mirror src/modules/audio_processing/test/py_quality_assessment/apm_configs/default.json py_quality_assessment/apm_configs/default.json
+Traceback (most recent call last):
+  File "src/build/toolchain/win/tool_wrapper.py", line 51, in <module>
+    import win32file    # pylint: disable=import-error
+ImportError: No module named win32file
+```
+
+solution, install it
+```
+<path-to-depot_tools>/<path-to-python>/python.exe -m pip install pywin32
+<path-to-depot_tools>/<path-to-python>/python.exe -m pip install pywin32
 ```
 
 # create packages and upload them
