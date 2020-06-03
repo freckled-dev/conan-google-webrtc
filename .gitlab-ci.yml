@@ -16,7 +16,7 @@ build windows debug:
     - conan create --profile ./profiles/windows_debug ./webrtc
     - conan remote add -f freckled_webrtc "https://api.bintray.com/conan/freckled/google-webrtc"
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
-    - conan upload --all --confirm --remote freckled_webrtc google-\*
+    - conan upload --all --confirm --remote freckled_webrtc google-*
 
 build ubuntu 18.04 debug:
   stage: build
