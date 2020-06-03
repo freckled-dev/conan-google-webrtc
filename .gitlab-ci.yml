@@ -19,7 +19,8 @@ build ubuntu 18.04 debug:
     - dedicated
   before_script:
     - sudo apt-get install -y lsb-release python python3-setuptools \
-        python3-wheel # sudo python3-pip
+        python3-wheel sudo python3-pip
+    - pip3 install conan
     - ./install-build-deps.sh --no-arm --no-chromeos-fonts --no-nacl
   script:
     - conan create --profile ./profiles/ubuntu1804_debug ./webrtc
