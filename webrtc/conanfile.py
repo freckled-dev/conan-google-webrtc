@@ -17,7 +17,7 @@ class WebrtcConan(ConanFile):
     options = {"shared": [False]}
     default_options = {"shared": False}
     # no_copy_source = True # on windows we patch. so we can't set it
-    short_paths = True
+    # short_paths = True
     _webrtc_source = ""
     _depot_tools_dir = ""
 

@@ -35,6 +35,8 @@ You must have the version 10.0.18362 or higher Windows 10 SDK installed. This ca
 
 disable Antimalware service
 
+enable long paths https://docs.conan.io/en/latest/reference/conanfile/attributes.html#short-paths
+
 use `cmd`. Everything else does not work. Including Power Shell.
 
 because there's no pip, install conan by installer \
