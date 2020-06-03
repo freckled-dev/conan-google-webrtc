@@ -20,7 +20,7 @@ build ubuntu 18.04 debug:
   cache:
     key: conan
     paths:
-      - .conan
+      - .cache
   tags:
     - docker
     - dedicated
