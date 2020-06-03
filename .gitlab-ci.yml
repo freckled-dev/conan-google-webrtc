@@ -1,3 +1,10 @@
+variables:
+  # we can't cache files outside conan, so we set conan to a source dir
+  CONAN_USER_HOME: "$CI_PROJECT_DIR/.cache"
+cache:
+  key: conan
+  paths:
+    - .cache
 
 build windows debug:
   stage: build
@@ -13,13 +20,6 @@ build windows debug:
 build ubuntu 18.04 debug:
   stage: build
   image: registry.gitlab.com/acof/webrtc-conan/ci/build_ubuntu:18.04
-  variables:
-    # we can't cache files outside conan, so we set conan to a source dir
-    CONAN_USER_HOME: "$CI_PROJECT_DIR/.cache"
-  cache:
-    key: conan
-    paths:
-      - .cache
   tags:
     - docker
     - dedicated
