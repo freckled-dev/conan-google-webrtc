@@ -7,7 +7,11 @@
 #   paths:
 #     - .cache
 
-build windows debug:
+# we got no strong enough CI machine. reenable after we got one.
+# TODO do a CONAN_USER_HOME per build, so that the build does NOT upload all
+# already existing package builds. ensure the path to CONAN_USER_HOME is short
+# because we need short_path support for the project to checkout and compile
+.build windows debug:
   stage: build
   tags:
     - windows
@@ -18,7 +22,7 @@ build windows debug:
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
     - conan upload --all --confirm --remote freckled_webrtc google-*
 
-build ubuntu 18.04 debug:
+build ubuntu 18.04:
   stage: build
   image: registry.gitlab.com/acof/webrtc-conan/ci/build_ubuntu:18.04
   tags:
@@ -26,6 +30,7 @@ build ubuntu 18.04 debug:
     - dedicated
   script:
     - conan create --profile ./profiles/ubuntu1804_debug ./webrtc
+    - conan create --keep-source --profile ./profiles/ubuntu1804_release ./webrtc
     - conan remote add -f freckled_webrtc "https://api.bintray.com/conan/freckled/google-webrtc"
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
     - conan upload --all --confirm --remote freckled_webrtc google-\*
