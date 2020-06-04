@@ -22,7 +22,8 @@
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
     - conan upload --all --confirm --remote freckled_webrtc google-*
 
-build ubuntu 18.04:
+# CI machines too slow and just not enough space
+.build ubuntu 18.04:
   stage: build
   image: registry.gitlab.com/acof/webrtc-conan/ci/build_ubuntu:18.04
   tags:
