@@ -16,7 +16,7 @@ class WebrtcConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [False]}
     default_options = {"shared": False}
-    # no_copy_source = True # on windows we patch. so we can't set it
+    no_copy_source = True # on windows we patch. but we patch in source()
     short_paths = True # it's a must. depot_tools checkout otherwise. Even if long paths are activated (win10 and msys)
     _webrtc_source = ""
     _depot_tools_dir = ""
@@ -35,10 +35,14 @@ class WebrtcConan(ConanFile):
             with tools.chdir('src'):
                 self.run("git checkout -b %s branch-heads/%s" % (self.version, self._branchHead))
                 self.run("gclient sync -D")
+        self._patch_runtime()
+
+    def _is_debug(self):
+        build_type = self.settings.get_safe("build_type", default="Release")
+        return build_type == "Debug"
 
     def build(self):
         self.setup_vars()
-        self._patch_runtime()
         # gn gen out/Default --args='is_debug=true use_custom_libcxx=false
         #   use_custom_libcxx_for_host=false cc_wrapper="ccache" use_rtti=true
         #   is_clang=true use_sysroot=false treat_warnings_as_errors=false
@@ -48,15 +52,16 @@ class WebrtcConan(ConanFile):
 
         # no bundled libc++
         args = "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+        args += "treat_warnings_as_errors=false "
         build_type = self.settings.get_safe("build_type", default="Release")
-        if build_type == "Debug":
+        if self._is_debug():
             args += "is_debug=true "
         else:
             args += "is_debug=false "
-        # no tests
-        # args += "rtc_include_tests=false libyuv_include_tests=false "
+        # no tests, else the windows debug version will not compile
+        args += "rtc_include_tests=false libyuv_include_tests=false "
         # no tools
-        # args += "rtc_build_tools=false "
+        args += "rtc_build_tools=false "
         if self.settings.os == "Windows":
             args += self.create_windows_arguments()
         if self.settings.os == "Linux":
@@ -72,6 +77,7 @@ class WebrtcConan(ConanFile):
                 if self.settings.os == "Windows":
                     with tools.vcvars(self.settings):
                         self.run(call)
+                        self.run("gn args --list \"%s\"" % (self.build_folder))
                 else:
                     self.run(call)
             with tools.chdir(self.build_folder):
@@ -90,17 +96,32 @@ class WebrtcConan(ConanFile):
                 'configs = [ ":static_crt" ]',
                 'configs = [ ":dynamic_crt" ]')
 
+            thread_file = os.path.join('rtc_base', 'thread.cc')
+            # https://stackoverflow.com/questions/62218555/webrtc-stddeque-iterator-exception-when-rtc-dcheck-is-on
+            # there's a bug with iterator debug
+            tools.replace_in_file(thread_file,
+                '#if RTC_DCHECK_IS_ON',
+                '#if 0 // patched in conanfile, RTC_DCHECK_IS_ON')
+
     def setup_vars(self):
         self._depot_tools_dir = os.path.join(self.source_folder, "depot_tools")
         self.output.info("depot_tools_dir '%s'" % (self._depot_tools_dir))
         self._webrtc_source = os.path.join(self.source_folder, "src")
 
     def create_windows_arguments(self):
-        args = ""
+        # remove visual_studio_version? according to documentation this value is always 2015
+        args = "is_clang=false visual_studio_version=2019 "
+        # args = ""
+        if self._is_debug():
+            # if not set the compilation will fail with:
+            # _iterator_debug_level value '0' doesn't match value '2'
+            # does not compile if tests and tools gets compiled in!
+            args += "enable_iterator_debugging=true "
+            # pass
         return args
 
     def create_linux_arguments(self):
-        args = "use_rtti=true treat_warnings_as_errors=false "
+        args = "use_rtti=true "
         args += "use_sysroot=false "
         # compiler = self.settings.compiler
         # if compiler == "gcc":

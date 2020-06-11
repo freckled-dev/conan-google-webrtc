@@ -4,6 +4,14 @@ conan build files for google webrtc. \
 https://webrtc.org \
 https://webrtc.github.io/webrtc-org/
 
+# miscelaneous
+
+list possible arguments
+```
+gn args --list out/my_build
+```
+
+
 # prerequists
 
 ## ubuntu

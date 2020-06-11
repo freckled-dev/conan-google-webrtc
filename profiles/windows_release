@@ -5,8 +5,8 @@ arch=x86_64
 arch_build=x86_64
 compiler=Visual Studio
 compiler.version=16
-compiler.runtime=MDd
-build_type=Debug
+compiler.runtime=MD
+build_type=Release
 # compiler.cppstd=17
 [options]
 [build_requires]
