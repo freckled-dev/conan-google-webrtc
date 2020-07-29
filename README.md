@@ -10,6 +10,7 @@ list possible arguments
 ```
 gn args --list out/my_build
 ```
+list for ubuntu 18.04 m84: https://gitlab.com/-/snippets/2000036
 
 
 # prerequists

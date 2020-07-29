@@ -32,6 +32,7 @@ build ubuntu 18.04 gcc7:
   script:
     - conan create --profile ./profiles/gcc7_debug ./webrtc
     - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc
+    - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc
     - conan remote add -f freckled_webrtc "https://api.bintray.com/conan/freckled/google-webrtc"
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
     - conan upload --all --confirm --remote freckled_webrtc google-\*

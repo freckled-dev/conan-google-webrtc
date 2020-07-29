@@ -47,6 +47,10 @@ class WebrtcConan(ConanFile):
         build_type = self.settings.get_safe("build_type", default="Release")
         return build_type == "Debug"
 
+    def _is_release_with_debug_information(self):
+        build_type = self.settings.get_safe("build_type", default="Release")
+        return build_type == "RelWithDebInfo"
+
     def build(self):
         self.setup_vars()
         # gn gen out/Default --args='is_debug=true use_custom_libcxx=false
@@ -136,6 +140,8 @@ class WebrtcConan(ConanFile):
         #     self.output.error("the compiler '%s' is not tested" % (compiler))
         if tools.which('ccache'):
             args += 'cc_wrapper=\\"ccache\\" '
+        if self._is_release_with_debug_information():
+            args += 'symbol_level=2 '
         return args
 
     def package(self):
