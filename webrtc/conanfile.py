@@ -21,6 +21,12 @@ class WebrtcConan(ConanFile):
     _webrtc_source = ""
     _depot_tools_dir = ""
 
+    def configure(self):
+        compiler = self.settings.compiler
+        if compiler == "gcc":
+            # due to webrtc using its own clang. no gcc version is needed. results in better cache hit-rate
+            del self.settings.compiler.version
+
     def source(self):
         self.setup_vars()
         if self.settings.os == "Windows":
