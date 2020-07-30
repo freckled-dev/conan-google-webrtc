@@ -141,7 +141,9 @@ class WebrtcConan(ConanFile):
         if tools.which('ccache'):
             args += 'cc_wrapper=\\"ccache\\" '
         if self._is_release_with_debug_information():
-            args += 'symbol_level=2 '
+            # '2' results in a ~450mb static library
+            # args += 'symbol_level=2 '
+            args += 'symbol_level=1 '
         return args
 
     def package(self):
