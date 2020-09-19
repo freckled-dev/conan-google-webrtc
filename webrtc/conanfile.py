@@ -177,6 +177,7 @@ class WebrtcConan(ConanFile):
                 "include/system_wrappers",
                 "include/third_party/abseil-cpp",
                 "include/third_party/boringssl/src/include",
+                "include/third_party/libyuv/include",
                 ]
         if self.settings.os == "Windows":
             self.cpp_info.defines = ["WEBRTC_WIN", "NOMINMAX"]
