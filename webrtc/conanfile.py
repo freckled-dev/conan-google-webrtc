@@ -76,6 +76,8 @@ class WebrtcConan(ConanFile):
             args += self.create_windows_arguments()
         if self.settings.os == "Linux":
             args += self.create_linux_arguments()
+        if self.settings.os == "Macos":
+            args += self.create_macos_arguments()
         call = "gn gen \"%s\" --args=\"%s\"" % (self.build_folder, args)
         self.output.info("call:%s" % (call))
         with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
@@ -146,6 +148,22 @@ class WebrtcConan(ConanFile):
             args += 'symbol_level=1 '
         return args
 
+    def create_macos_arguments(self):
+        args = "use_rtti=true "
+        args += "use_sysroot=false "
+        # compiler = self.settings.compiler
+        # if compiler == "gcc":
+        #     args += "is_clang=false use_gold=false use_lld=false "
+        # else:
+        #     self.output.error("the compiler '%s' is not tested" % (compiler))
+        if tools.which('ccache'):
+            args += 'cc_wrapper=\\"ccache\\" '
+        if self._is_release_with_debug_information():
+            # '2' results in a ~450mb static library
+            # args += 'symbol_level=2 '
+            args += 'symbol_level=1 '
+        return args
+
     def package(self):
         self.copy("*.h", dst="include", src="src")
 
@@ -178,5 +196,7 @@ class WebrtcConan(ConanFile):
         if self.settings.os == "Linux":
             self.cpp_info.system_libs = ["dl"]
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX"]
+        if self.settings.os == "Macos":
+            self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_MAC"]
 
 
