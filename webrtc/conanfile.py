@@ -96,24 +96,31 @@ class WebrtcConan(ConanFile):
                 self.run('ninja')
 
     def _patch_runtime(self):
-        if self.settings.os != "Windows":
-            return
         # https://groups.google.com/forum/#!topic/discuss-webrtc/f44XZnQDNIA
         # https://stackoverflow.com/questions/49083754/linking-webrtc-with-qt-on-windows
         # https://docs.conan.io/en/latest/reference/tools.html#tools-replace-in-file
         # TODO check the actually set runtime
-        with tools.chdir(self._webrtc_source):
-            build_gn_file = os.path.join('build', 'config', 'win', 'BUILD.gn')
-            tools.replace_in_file(build_gn_file,
-                'configs = [ ":static_crt" ]',
-                'configs = [ ":dynamic_crt" ]')
+        if self.settings.os == "Windows":
+            with tools.chdir(self._webrtc_source):
+                build_gn_file = os.path.join('build', 'config', 'win', 'BUILD.gn')
+                tools.replace_in_file(build_gn_file,
+                    'configs = [ ":static_crt" ]',
+                    'configs = [ ":dynamic_crt" ]')
 
-            thread_file = os.path.join('rtc_base', 'thread.cc')
-            # https://stackoverflow.com/questions/62218555/webrtc-stddeque-iterator-exception-when-rtc-dcheck-is-on
-            # there's a bug with iterator debug
-            tools.replace_in_file(thread_file,
-                '#if RTC_DCHECK_IS_ON',
-                '#if 0 // patched in conanfile, RTC_DCHECK_IS_ON')
+                thread_file = os.path.join('rtc_base', 'thread.cc')
+                # https://stackoverflow.com/questions/62218555/webrtc-stddeque-iterator-exception-when-rtc-dcheck-is-on
+                # there's a bug with iterator debug
+                tools.replace_in_file(thread_file,
+                    '#if RTC_DCHECK_IS_ON',
+                    '#if 0 // patched in conanfile, RTC_DCHECK_IS_ON')
+        if self.settings.os == "Linux":
+            with tools.chdir(self._webrtc_source):
+                clockdrift_detector_file = os.path.join(
+                        'modules', 'audio_processing', 'aec3', 'clockdrift_detector.h')
+                # missing `std::` wont compile with gcc10
+                tools.replace_in_file(clockdrift_detector_file,
+                    ' size_t stability_counter_;',
+                    ' std::size_t stability_counter_;')
 
     def setup_vars(self):
         self._depot_tools_dir = os.path.join(self.source_folder, "depot_tools")
@@ -188,6 +195,7 @@ class WebrtcConan(ConanFile):
                 "include/system_wrappers",
                 "include/third_party/abseil-cpp",
                 "include/third_party/boringssl/src/include",
+                "include/third_party/libyuv/include",
                 ]
         if self.settings.os == "Windows":
             self.cpp_info.defines = ["WEBRTC_WIN", "NOMINMAX"]
