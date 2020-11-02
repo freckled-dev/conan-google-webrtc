@@ -122,13 +122,14 @@ class WebrtcConan(ConanFile):
                     ' size_t stability_counter_;',
                     ' std::size_t stability_counter_;')
         if self.settings.os == "Macos":
-            with tools.chdir(self._webrtc_source):
-                mac_build_gn_file = os.path.join(
-                        'build', 'toolchain', 'mac', 'BUILD.gn')
-                # remove the `-D` from the libtool call, so it's XCode < 10.2 compatible
-                tools.replace_in_file(mac_build_gn_file,
-                    'libtool -static -D {{arflags}}',
-                    'libtool -static {{arflags}}')
+            pass
+            # with tools.chdir(self._webrtc_source):
+            #     mac_build_gn_file = os.path.join(
+            #             'build', 'toolchain', 'mac', 'BUILD.gn')
+            #     # remove the `-D` from the libtool call, so it's XCode < 10.2 compatible
+            #     tools.replace_in_file(mac_build_gn_file,
+            #         'libtool -static -D {{arflags}}',
+            #         'libtool -static {{arflags}}')
 
 
     def setup_vars(self):
