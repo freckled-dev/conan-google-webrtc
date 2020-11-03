@@ -1,5 +1,7 @@
 import os
 from conans import ConanFile, CMake, tools
+from conans.tools import os_info
+from conans.errors import ConanInvalidConfiguration
 
 class WebrtcConan(ConanFile):
     name = "google-webrtc"
@@ -37,7 +39,10 @@ class WebrtcConan(ConanFile):
             git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
         with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
             self.run("gclient")
-            self.run("fetch --nohooks webrtc")
+            if self.settings.os == "iOS":
+                self.run("fetch --nohooks webrtc_ios")
+            else:
+                self.run("fetch --nohooks webrtc")
             with tools.chdir('src'):
                 self.run("git checkout -b %s branch-heads/%s" % (self.version, self._branchHead))
                 self.run("gclient sync -D")
@@ -61,9 +66,10 @@ class WebrtcConan(ConanFile):
         #   use_lld=false use_gold=false'
 
         # no bundled libc++
-        args = "use_custom_libcxx=false use_custom_libcxx_for_host=false "
-        args += "treat_warnings_as_errors=false "
-        build_type = self.settings.get_safe("build_type", default="Release")
+        args = ""
+        if self.settings.os != "iOS":
+            args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+            args += "treat_warnings_as_errors=false "
         if self._is_debug():
             args += "is_debug=true "
         else:
@@ -78,6 +84,8 @@ class WebrtcConan(ConanFile):
             args += self.create_linux_arguments()
         if self.settings.os == "Macos":
             args += self.create_macos_arguments()
+        if self.settings.os == "iOS":
+            args += self.create_ios_arguments()
         call = "gn gen \"%s\" --args=\"%s\"" % (self.build_folder, args)
         self.output.info("call:%s" % (call))
         with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
@@ -168,11 +176,26 @@ class WebrtcConan(ConanFile):
     def create_macos_arguments(self):
         args = "use_rtti=true "
         args += "use_sysroot=false "
-        # compiler = self.settings.compiler
-        # if compiler == "gcc":
-        #     args += "is_clang=false use_gold=false use_lld=false "
-        # else:
-        #     self.output.error("the compiler '%s' is not tested" % (compiler))
+        if tools.which('ccache'):
+            args += 'cc_wrapper=\\"ccache\\" '
+        if self._is_release_with_debug_information():
+            # '2' results in a ~450mb static library
+            # args += 'symbol_level=2 '
+            args += 'symbol_level=1 '
+        return args
+
+    def create_ios_arguments(self):
+        args = "use_rtti=true "
+        args += "use_sysroot=false "
+        args += 'target_os=\\"ios\\" ios_enable_code_signing=false '
+        # for sigining you can add the following, and remove ios_enable_code_signing
+        # 'ios_code_signing_identity=\\"<your apple development identity>\\" '
+        if self.settings.arch == "armv8":
+            args += 'target_cpu=\\"arm64\\" '
+        elif self.settings.arch == "x86_64":
+            args += 'target_cpu=\\"x64\\" '
+        else:
+            raise ConanInvalidConfiguration("not a valid iOS arch:" + settings.arch)
         if tools.which('ccache'):
             args += 'cc_wrapper=\\"ccache\\" '
         if self._is_release_with_debug_information():
