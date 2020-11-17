@@ -67,9 +67,9 @@ class WebrtcConan(ConanFile):
 
         # no bundled libc++
         args = ""
-        if self.settings.os != "iOS":
-            args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
-            args += "treat_warnings_as_errors=false "
+        # if self.settings.os != "iOS":
+        args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+        args += "treat_warnings_as_errors=false "
         if self._is_debug():
             args += "is_debug=true "
         else:
@@ -185,8 +185,9 @@ class WebrtcConan(ConanFile):
         return args
 
     def create_ios_arguments(self):
-        args = "use_rtti=true "
-        args += "use_sysroot=false "
+        args = ""
+        args += "use_rtti=true "
+        # args += "use_sysroot=false "
         args += 'target_os=\\"ios\\" ios_enable_code_signing=false '
         # for sigining you can add the following, and remove ios_enable_code_signing
         # 'ios_code_signing_identity=\\"<your apple development identity>\\" '
@@ -239,5 +240,7 @@ class WebrtcConan(ConanFile):
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_LINUX"]
         if self.settings.os == "Macos":
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_MAC"]
+        if self.settings.os == "iOS":
+            self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_IOS", "WEBRTC_MAC"]
 
 
