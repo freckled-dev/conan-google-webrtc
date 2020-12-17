@@ -8,8 +8,8 @@ class WebrtcConan(ConanFile):
     # versions https://chromiumdash.appspot.com/releases?platform=Linux
     # the version 83.0.4103.61 means v83, branch head 4103 (daily branches)
     # https://groups.google.com/forum/#!msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ
-    version = "84"
-    _branchHead = "4147"
+    version = "88"
+    _branchHead = "4324"
     license = "MIT"
     author = "Markus Lanner <contact@markus-lanner.com>"
     url = "github.com/freckled-dev/conan-google-webrtc"
@@ -79,13 +79,13 @@ class WebrtcConan(ConanFile):
         # no tools
         args += "rtc_build_tools=false "
         if self.settings.os == "Windows":
-            args += self.create_windows_arguments()
+            args += self._create_windows_arguments()
         if self.settings.os == "Linux":
-            args += self.create_linux_arguments()
+            args += self._create_linux_arguments()
         if self.settings.os == "Macos":
-            args += self.create_macos_arguments()
+            args += self._create_macos_arguments()
         if self.settings.os == "iOS":
-            args += self.create_ios_arguments()
+            args += self._create_ios_arguments()
         call = "gn gen \"%s\" --args=\"%s\"" % (self.build_folder, args)
         self.output.info("call:%s" % (call))
         with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
@@ -145,7 +145,7 @@ class WebrtcConan(ConanFile):
         self.output.info("depot_tools_dir '%s'" % (self._depot_tools_dir))
         self._webrtc_source = os.path.join(self.source_folder, "src")
 
-    def create_windows_arguments(self):
+    def _create_windows_arguments(self):
         # remove visual_studio_version? according to documentation this value is always 2015
         args = "is_clang=false visual_studio_version=2019 "
         # args = ""
@@ -157,7 +157,7 @@ class WebrtcConan(ConanFile):
             # pass
         return args
 
-    def create_linux_arguments(self):
+    def _create_linux_arguments(self):
         args = "use_rtti=true "
         args += "use_sysroot=false "
         # compiler = self.settings.compiler
@@ -173,7 +173,7 @@ class WebrtcConan(ConanFile):
             args += 'symbol_level=1 '
         return args
 
-    def create_macos_arguments(self):
+    def _create_macos_arguments(self):
         args = "use_rtti=true "
         args += "use_sysroot=false "
         if tools.which('ccache'):
@@ -184,11 +184,14 @@ class WebrtcConan(ConanFile):
             args += 'symbol_level=1 '
         return args
 
-    def create_ios_arguments(self):
+    def _create_ios_arguments(self):
         args = ""
         args += "use_rtti=true "
         # args += "use_sysroot=false "
         args += 'target_os=\\"ios\\" ios_enable_code_signing=false '
+        # `enable_ios_bitcode` needs `use_xcode_clang=true`
+        # if `use_xcode_clang` is false, it will use the with the repo shipped clang
+        args += 'enable_ios_bitcode=true use_xcode_clang=true '
         # for sigining you can add the following, and remove ios_enable_code_signing
         # 'ios_code_signing_identity=\\"<your apple development identity>\\" '
         if self.settings.arch == "armv8":
