@@ -25,9 +25,10 @@ class WebrtcConan(ConanFile):
 
     def configure(self):
         compiler = self.settings.compiler
-        if compiler == "gcc":
+        if compiler == "gcc" or compiler == "clang":
             # due to webrtc using its own clang. no gcc version is needed. results in better cache hit-rate
-            del self.settings.compiler.version
+            #del self.settings.compiler.version
+            del self.settings.compiler
 
     def source(self):
         self.setup_vars()
@@ -65,10 +66,14 @@ class WebrtcConan(ConanFile):
         #   clang_base_path="/usr" clang_use_chrome_plugins=false
         #   use_lld=false use_gold=false'
 
-        # no bundled libc++
         args = ""
-        # if self.settings.os != "iOS":
-        args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+        # no bundled libc++
+        #if self.settings.os != "iOS":
+            # args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
+            # args += "use_custom_libcxx_for_host=false "
+        # needed on linux 64bit, else there will be compile errors,
+        # like `td::__1::__next_prime`
+        args += "use_custom_libcxx=false "
         args += "treat_warnings_as_errors=false "
         if self._is_debug():
             args += "is_debug=true "
@@ -131,13 +136,15 @@ class WebrtcConan(ConanFile):
                     ' std::size_t stability_counter_;')
         if self.settings.os == "Macos":
             pass
-            # with tools.chdir(self._webrtc_source):
-            #     mac_build_gn_file = os.path.join(
-            #             'build', 'toolchain', 'mac', 'BUILD.gn')
-            #     # remove the `-D` from the libtool call, so it's XCode < 10.2 compatible
-            #     tools.replace_in_file(mac_build_gn_file,
-            #         'libtool -static -D {{arflags}}',
-            #         'libtool -static {{arflags}}')
+
+        # there is a `include <cstring>` missing when not compiling with 
+        # their stdcxx (`use_custom_libcxx`)
+        with tools.chdir(self._webrtc_source):
+            stack_copier_signal_file = os.path.join( 'base', 'profiler', 'stack_copier_signal.cc')
+            tools.replace_in_file(stack_copier_signal_file,
+                '#include <syscall.h>',
+                '''#include <syscall.h>
+                   #include <cstring>''')
 
 
     def setup_vars(self):
@@ -158,8 +165,14 @@ class WebrtcConan(ConanFile):
         return args
 
     def _create_linux_arguments(self):
-        args = "use_rtti=true "
-        args += "use_sysroot=false "
+        with tools.chdir(self._webrtc_source):
+            self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=amd64")
+            if self.settings.arch == "armv8":
+                self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64")
+        args = ""
+        args += "use_rtti=true "
+        if self.settings.arch != "armv8":
+            args += "use_sysroot=false "
         # compiler = self.settings.compiler
         # if compiler == "gcc":
         #     args += "is_clang=false use_gold=false use_lld=false "
@@ -167,6 +180,8 @@ class WebrtcConan(ConanFile):
         #     self.output.error("the compiler '%s' is not tested" % (compiler))
         if tools.which('ccache'):
             args += 'cc_wrapper=\\"ccache\\" '
+        if self.settings.arch == "armv8":
+            args += 'target_cpu=\\"arm64\\" '
         if self._is_release_with_debug_information():
             # '2' results in a ~450mb static library
             # args += 'symbol_level=2 '
