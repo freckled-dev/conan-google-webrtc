@@ -19,6 +19,9 @@ list for ubuntu 18.04 m84: https://gitlab.com/-/snippets/2000036
 
 install system dependencies
 ```bash
+sudo apt install -y sudo lsb-release
+curl -LO https://raw.githubusercontent.com/chromium/chromium/master/build/install-build-deps.sh
+chmod u+x install-build-deps.sh
 ./install-build-deps.sh
 ```
 
