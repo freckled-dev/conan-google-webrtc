@@ -94,6 +94,8 @@ solution, install it
 
 # create packages and upload them
 
+https://docs.gitlab.com/ee/user/packages/conan_repository/index.html
+
 create release and debug packages
 ```bash
 conan create .
@@ -103,7 +105,11 @@ conan create . -s build_type=Debug
 upload them by
 ```bat
 conan remote add freckled_webrtc https://api.bintray.com/conan/freckled/google-webrtc
+# conan remote add gitlab https://gitlab.com/api/v4/projects/19162728/packages/conan
+# export CONAN_LOGIN_USERNAME=
+# export CONAN_PASSWORD=
+# conan upload --all --remote=gitlab google-webrtc
 conan user -p <APIKEY> -r freckled_webrtc freckled
-conan upload --all -r freckled_webrtc google-webrtc
+conan upload --all --remote=freckled_webrtc google-webrtc
 ```
 
