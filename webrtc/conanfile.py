@@ -16,8 +16,8 @@ class WebrtcConan(ConanFile):
     description = "Google Webrtc"
     topics = ("webrtc", "google")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [False]}
-    default_options = {"shared": False}
+    options = {"shared": [False], "use_h264": [True, False]}
+    default_options = {"shared": False, "use_h264": True}
     no_copy_source = True # on windows we patch. but we patch in source()
     short_paths = True # it's a must. depot_tools checkout otherwise. Even if long paths are activated (win10 and msys)
     _webrtc_source = ""
@@ -83,6 +83,10 @@ class WebrtcConan(ConanFile):
         args += "rtc_include_tests=false libyuv_include_tests=false "
         # no tools
         args += "rtc_build_tools=false "
+        if self.options.use_h264:
+            args += "rtc_use_h264=true "
+        else:
+            args += "rtc_use_h264=false "
         if self.settings.os == "Windows":
             args += self._create_windows_arguments()
         if self.settings.os == "Linux":
