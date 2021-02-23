@@ -84,9 +84,7 @@ class WebrtcConan(ConanFile):
         # no tools
         args += "rtc_build_tools=false "
         if self.options.use_h264:
-            args += "rtc_use_h264=true "
-        else:
-            args += "rtc_use_h264=false "
+            args += "rtc_use_h264=true proprietary_codecs=true ffmpeg_branding=\\\"Chrome\\\" "
         if self.settings.os == "Windows":
             args += self._create_windows_arguments()
         if self.settings.os == "Linux":
@@ -264,5 +262,8 @@ class WebrtcConan(ConanFile):
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_MAC"]
         if self.settings.os == "iOS":
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_IOS", "WEBRTC_MAC"]
+        if self.options.use_h264:
+            self.cpp_info.defines += ["WEBRTC_USE_H264"]
+
 
 
