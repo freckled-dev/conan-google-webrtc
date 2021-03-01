@@ -171,9 +171,11 @@ class WebrtcConan(ConanFile):
             self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=amd64")
             if self.settings.arch == "armv8":
                 self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64")
+            if self.settings.arch == "armv7":
+                self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm")
         args = ""
         args += "use_rtti=true "
-        if self.settings.arch != "armv8":
+        if self.settings.arch != "armv8" and self.settings.arch != "armv7":
             args += "use_sysroot=false "
         # compiler = self.settings.compiler
         # if compiler == "gcc":
@@ -184,6 +186,8 @@ class WebrtcConan(ConanFile):
             args += 'cc_wrapper=\\"ccache\\" '
         if self.settings.arch == "armv8":
             args += 'target_cpu=\\"arm64\\" '
+        if self.settings.arch == "armv7":
+            args += 'target_cpu=\\"arm\\" '
         if self._is_release_with_debug_information():
             # '2' results in a ~450mb static library
             # args += 'symbol_level=2 '
@@ -227,6 +231,7 @@ class WebrtcConan(ConanFile):
 
     def package(self):
         self.copy("*.h", dst="include", src="src")
+        self.copy("*.inc", dst="include", src="src")
 
         self.copy("*webrtc.lib", dst="lib", keep_path=False)
         self.copy("*webrtc.dll", dst="bin", keep_path=False)
