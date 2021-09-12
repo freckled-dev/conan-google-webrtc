@@ -43,7 +43,7 @@ Check “Debugging Tools For Windows” → Change.
 
 create and set the environment variable: "DEPOT_TOOLS_WIN_TOOLCHAIN=1". Else it searches for vs2017 in googly style.
 
-You must have the version 10.0.18362 or higher Windows 10 SDK installed. This can be installed separately or by checking the appropriate box in the Visual Studio Installer. or by https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/
+You must have the version 10.0.19041 or higher Windows 10 SDK installed. This can be installed separately or by checking the appropriate box in the Visual Studio Installer. or by https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/
 
 disable Antimalware service
 

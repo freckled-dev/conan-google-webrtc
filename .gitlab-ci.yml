@@ -22,7 +22,7 @@
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
     - conan upload --all --confirm --remote freckled_webrtc google-*
 
-.build ubuntu 18.04 gcc7:
+build ubuntu 18.04 gcc7:
   stage: build
   image: registry.gitlab.com/acof/webrtc-conan/ci/build_ubuntu:18.04
   tags:
@@ -33,8 +33,9 @@
     - conan create --profile ./profiles/gcc7_debug ./webrtc
     - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc
     - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc
-    - conan remote add -f freckled_webrtc "https://api.bintray.com/conan/freckled/google-webrtc"
-    - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
-    - conan upload --all --confirm --remote freckled_webrtc google-\*
+  after_script:
+    - conan remote add gitlab "${CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/conan"
+    - conan user -p "${CI_JOB_TOKEN}" --remote gitlab $CONAN_LOGIN_USERNAME
+    - conan upload --all --confirm --remote gitlab google-\*
 
 
