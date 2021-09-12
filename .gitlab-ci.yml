@@ -28,7 +28,7 @@ build ubuntu 18.04 gcc7:
   tags:
     - docker
     - dedicated
-    - big
+    # - big
   script:
     - conan create --profile ./profiles/gcc7_debug ./webrtc
     - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc
