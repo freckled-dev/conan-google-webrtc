@@ -37,7 +37,7 @@ class WebrtcConan(ConanFile):
             tools.unzip("depot_tools.zip", destination="depot_tools")
         else:
             git_depot_tools = tools.Git(folder="depot_tools")
-            git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "master")
+            git_depot_tools.clone("https://chromium.googlesource.com/chromium/tools/depot_tools.git", "main")
         with tools.environment_append({"PATH": [self._depot_tools_dir], "DEPOT_TOOLS_WIN_TOOLCHAIN": "0"}):
             self.run("gclient")
             if self.settings.os == "iOS":
