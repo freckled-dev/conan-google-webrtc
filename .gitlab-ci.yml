@@ -30,9 +30,9 @@ build ubuntu 18.04 gcc7:
     - dedicated
     # - big
   script:
-    - conan create --profile ./profiles/gcc7_debug ./webrtc
-    - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc
-    - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc
+    - conan create --profile ./profiles/gcc7_debug ./webrtc acof/stable
+    - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc acof/stable
+    - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc acof/stable
   after_script:
     - conan remote add gitlab "${CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/conan"
     - conan user -p "${CI_JOB_TOKEN}" --remote gitlab ci_user
