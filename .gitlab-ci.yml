@@ -22,20 +22,35 @@
     - conan user -p "$conan_api_password" --remote freckled_webrtc freckled
     - conan upload --all --confirm --remote freckled_webrtc google-*
 
-build ubuntu 18.04 gcc7:
+.linux_build: &linux_build
   stage: build
   image: registry.gitlab.com/acof/webrtc-conan/ci/build_ubuntu:18.04
   tags:
     - docker
     - dedicated
     # - big
-  script:
-    - conan create --profile ./profiles/gcc7_debug ./webrtc acof/stable
-    - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc acof/stable
-    - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc acof/stable
+
+.conan_upload: &conan_upload
+  <<: *linux_build
   after_script:
     - conan remote add gitlab "${CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/conan"
     - conan user -p "${CI_JOB_TOKEN}" --remote gitlab ci_user
     - conan upload --all --confirm --remote gitlab google-\*
+
+build ubuntu 18.04 gcc7:
+  <<: *linux_build
+  script:
+    - conan create --profile ./profiles/gcc7_debug ./webrtc acof/stable
+    - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc acof/stable
+    - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc acof/stable
+  <<: *conan_upload
+
+build ubuntu 18.04 arm64v8:
+  <<: *linux_build
+  script:
+    - conan create --profile ./profiles/linux_armv8_debug ./webrtc acof/stable
+    - conan create --keep-source --profile ./profiles/linux_armv8_debug -s build_type=RelWithDebInfo ./webrtc acof/stable
+    - conan create --keep-source --profile ./profiles/linux_armv8_debug -s build_type=Release ./webrtc acof/stable
+  <<: *conan_upload
 
 
