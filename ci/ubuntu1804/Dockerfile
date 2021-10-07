@@ -1,8 +1,8 @@
 FROM ubuntu:18.04
 
 COPY install-build-deps.sh install-build-deps.sh
-RUN TZ=Europe/Berlin DEBIAN_FRONTEND=noninteractive apt-get update \
-  && apt-get install -y \
+RUN apt-get update \
+  && TZ=Europe/Berlin DEBIAN_FRONTEND=noninteractive apt-get install -y \
     tzdata \
     lsb-release python python3-setuptools python3-wheel python3-pip fish sudo \
   && pip3 install conan \

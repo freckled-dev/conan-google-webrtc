@@ -1,16 +1,17 @@
 # about
 
-conan build files for google webrtc. \
-https://webrtc.org \
-https://webrtc.github.io/webrtc-org/
+conan build files for google webrtc.
+- [webrtc.org](https://webrtc.org)
+- [webrtc.github.io](https://webrtc.github.io/webrtc-org/)
 
 # miscelaneous
 
 list possible arguments
 ```
+gn gen out/my_build
 gn args --list out/my_build
 ```
-list for ubuntu 18.04 m84: https://gitlab.com/-/snippets/2000036
+list for [ubuntu 18.04 v88](example_gn_list)
 
 
 # prerequists
@@ -54,8 +55,8 @@ AND set it to msys git (git bash) `git config --system core.longpaths true`
 use `cmd`. Everything else does not work. Including Power Shell.
 
 because there's no pip, install conan by installer \
-https://conan.io/downloads.html
-https://dl.bintray.com/conan/installers/conan-win-64_1_24_1.exe
+- [downloads](https://conan.io/downloads.html)
+- [`conan-win-64_1_24_1.exe`](https://dl.bintray.com/conan/installers/conan-win-64_1_24_1.exe)
 
 now ur set up. create the packages by
 
