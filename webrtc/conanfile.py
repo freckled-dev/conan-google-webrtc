@@ -73,7 +73,7 @@ class WebrtcConan(ConanFile):
             # args += "use_custom_libcxx_for_host=false "
         # needed on linux 64bit, else there will be compile errors,
         # like `td::__1::__next_prime`
-        args += "use_custom_libcxx=false "
+        #args += "use_custom_libcxx=false "
         args += "treat_warnings_as_errors=false "
         if self._is_debug():
             args += "is_debug=true "
