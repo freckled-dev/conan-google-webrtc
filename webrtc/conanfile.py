@@ -61,22 +61,19 @@ class WebrtcConan(ConanFile):
 
     def build(self):
         self.setup_vars()
-        # gn gen out/Default --args='is_debug=true use_custom_libcxx=false
-        #   use_custom_libcxx_for_host=false cc_wrapper="ccache" use_rtti=true
-        #   is_clang=true use_sysroot=false treat_warnings_as_errors=false
-        #   rtc_include_tests=false libyuv_include_tests=false
-        #   clang_base_path="/usr" clang_use_chrome_plugins=false
-        #   use_lld=false use_gold=false'
-
         args = ""
         # no bundled libc++
         #if self.settings.os != "iOS":
             # args += "use_custom_libcxx=false use_custom_libcxx_for_host=false "
             # args += "use_custom_libcxx_for_host=false "
         # needed on linux 64bit, else there will be compile errors,
-        # like `td::__1::__next_prime`
-        #args += "use_custom_libcxx=false "
+        # like `std::__1::__next_prime`
+        args += "use_custom_libcxx=false "
+        # args += "use_custom_libcxx_for_host=false " # default is false
         args += "treat_warnings_as_errors=false "
+        # does not work well! check https://groups.google.com/g/discuss-webrtc/c/muT4irg2dvI/m/X84U9K7STi8J for patch
+        #args += "rtc_build_ssl=false "
+        #args += 'rtc_ssl_root=\\"/usr\\" '
         if self._is_debug():
             args += "is_debug=true "
         else:
