@@ -18,6 +18,8 @@ class WebrtcConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [False], "use_h264": [True, False]}
     default_options = {"shared": False, "use_h264": True}
+    default_user = "acof"
+    default_channel = "stable"
     no_copy_source = True # on windows we patch. but we patch in source()
     short_paths = True # it's a must. depot_tools checkout otherwise. Even if long paths are activated (win10 and msys)
     _webrtc_source = ""
