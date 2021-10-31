@@ -103,9 +103,10 @@ class WebrtcConan(ConanFile):
                 if self.settings.os == "Windows":
                     with tools.vcvars(self.settings):
                         self.run(call)
-                        self.run("gn args --list \"%s\"" % (self.build_folder))
                 else:
                     self.run(call)
+            # show configuration
+            self.run("gn args --list \"%s\"" % (self.build_folder))
             with tools.chdir(self.build_folder):
                 self.run('ninja')
 
