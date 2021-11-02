@@ -105,8 +105,8 @@ class WebrtcConan(ConanFile):
                         self.run(call)
                 else:
                     self.run(call)
-            # show configuration
-            self.run("gn args --list \"%s\"" % (self.build_folder))
+                # show configuration
+                self.run("gn args --list \"%s\"" % (self.build_folder))
             with tools.chdir(self.build_folder):
                 self.run('ninja')
 
