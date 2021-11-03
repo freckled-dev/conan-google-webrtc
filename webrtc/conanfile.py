@@ -69,7 +69,9 @@ class WebrtcConan(ConanFile):
         # needed on linux 64bit, else there will be compile errors,
         # like `std::__1::__next_prime`
         args += "use_custom_libcxx=false "
-        # args += "use_custom_libcxx_for_host=false " # default is false
+        if self.settings.arch == "armv8" or self.settings.arch == "armv7":
+            # set host cxx, else you might get the error `version `GLIBCXX_3.4.26' not found` when running `protoc`
+            args += "use_custom_libcxx_for_host=true "
         args += "treat_warnings_as_errors=false "
         # does not work well! check https://groups.google.com/g/discuss-webrtc/c/muT4irg2dvI/m/X84U9K7STi8J for patch
         #args += "rtc_build_ssl=false "
