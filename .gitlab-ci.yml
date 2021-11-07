@@ -40,17 +40,14 @@
 build ubuntu 18.04 gcc7:
   <<: *linux_build
   script:
-    - conan create --profile ./profiles/gcc7_debug ./webrtc
-    - conan create --keep-source --profile ./profiles/gcc7_release ./webrtc
-    - conan create --keep-source --profile ./profiles/gcc7_relwithdebinfo ./webrtc
+    - conan create --profile ./profiles/gcc7_relwithdebinfo ./webrtc
   <<: *conan_upload
 
-build ubuntu 18.04 arm64v8:
+build ubuntu 18.04 arm:
   <<: *linux_build
   script:
-    - conan create --profile ./profiles/linux_armv8_debug ./webrtc
-    - conan create --keep-source --profile ./profiles/linux_armv8_debug -s build_type=RelWithDebInfo ./webrtc
-    - conan create --keep-source --profile ./profiles/linux_armv8_debug -s build_type=Release ./webrtc
+    - conan create --profile ./profiles/linux_armv8_relwithdebinfo ./webrtc
+    - conan create --keep-source --profile ./profiles/linux_armv7_relwithdebinfo ./webrtc
   <<: *conan_upload
 
 
