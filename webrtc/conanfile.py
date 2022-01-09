@@ -16,8 +16,12 @@ class WebrtcConan(ConanFile):
     description = "Google Webrtc"
     topics = ("webrtc", "google")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [False], "use_h264": [True, False]}
-    default_options = {"shared": False, "use_h264": True}
+    options = {
+        "shared": [False],
+        "use_h264": [True, False],
+        "openssl": ["internal", "system", "conan"]
+    }
+    default_options = {"shared": False, "use_h264": True, "openssl": "internal"}
     default_user = "acof"
     default_channel = "stable"
     no_copy_source = True # on windows we patch. but we patch in source()
@@ -31,6 +35,8 @@ class WebrtcConan(ConanFile):
             # due to webrtc using its own clang. no gcc version is needed. results in better cache hit-rate
             #del self.settings.compiler.version
             del self.settings.compiler
+        if self.options.openssl == "system" and self.settings.os != "Linux":
+            raise ConanInvalidConfiguration("unsupported option for openssl. 'system' is only supported on Linux.")
 
     def source(self):
         self.setup_vars()
@@ -50,6 +56,10 @@ class WebrtcConan(ConanFile):
                 self.run("git checkout -b %s branch-heads/%s" % (self.version, self._branchHead))
                 self.run("gclient sync -D")
         self._patch_runtime()
+
+    def requirements(self):
+        if self.options.openssl == "conan":
+            self.requires("openssl/1.1.1l")
 
     def _is_debug(self):
         build_type = self.settings.get_safe("build_type", default="Release")
@@ -86,6 +96,7 @@ class WebrtcConan(ConanFile):
         args += "rtc_build_tools=false "
         if self.options.use_h264:
             args += "rtc_use_h264=true proprietary_codecs=true ffmpeg_branding=\\\"Chrome\\\" "
+        args += self._create_openssl_arguments()
         if self.settings.os == "Windows":
             args += self._create_windows_arguments()
         if self.settings.os == "Linux":
@@ -155,6 +166,15 @@ class WebrtcConan(ConanFile):
         self._depot_tools_dir = os.path.join(self.source_folder, "depot_tools")
         self.output.info("depot_tools_dir '%s'" % (self._depot_tools_dir))
         self._webrtc_source = os.path.join(self.source_folder, "src")
+
+    def _create_openssl_arguments(self):
+        args = ""
+        if self.options.openssl == "system":
+            args += 'rtc_build_ssl=false rtc_ssl_root=\\"/usr/include\\" '
+        if self.options.openssl == "conan":
+            openssl_include_path = self.deps_cpp_info["openssl"].include_paths
+            args += 'rtc_build_ssl=false rtc_ssl_root=\\"%s\\" ' % openssl_include_path
+        return args
 
     def _create_windows_arguments(self):
         # remove visual_studio_version? according to documentation this value is always 2015
@@ -258,6 +278,8 @@ class WebrtcConan(ConanFile):
                 "include/third_party/boringssl/src/include",
                 "include/third_party/libyuv/include",
                 ]
+        if self.options.openssl == "internal":
+            self.cpp_info.includedirs += ["include/third_party/boringssl/src/include"]
         if self.settings.os == "Windows":
             self.cpp_info.defines = ["WEBRTC_WIN", "NOMINMAX"]
             self.cpp_info.system_libs = ['secur32', 'winmm', 'dmoguids',
