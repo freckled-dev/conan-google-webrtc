@@ -1,0 +1,10 @@
+#!/bin/bash -ex
+
+cd "$(dirname "$0")"
+
+conan build \
+  -sf ../source \
+  -if ../install \
+  -bf ../build \
+  webrtc
+

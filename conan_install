@@ -1,0 +1,11 @@
+#!/bin/bash -ex
+
+cd "$(dirname "$0")"
+
+conan install \
+  -sf ../source \
+  -if ../install \
+  -pr:h profiles/linux_armv7_relwithdebinfo \
+  -pr:b default \
+  webrtc
+

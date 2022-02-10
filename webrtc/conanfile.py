@@ -8,16 +8,16 @@ class WebrtcConan(ConanFile):
     # versions https://chromiumdash.appspot.com/releases?platform=Linux
     # the version 83.0.4103.61 means v83, branch head 4103 (daily branches)
     # https://groups.google.com/forum/#!msg/discuss-webrtc/Ozvbd0p7Q1Y/M4WN2cRKCwAJ
-    version = "94"
-    _branchHead = "4606"
+    version = "97"
+    _branchHead = "4692"
     license = "MIT"
     author = "Markus Lanner <contact@markus-lanner.com>"
     url = "github.com/freckled-dev/conan-google-webrtc"
     description = "Google Webrtc"
     topics = ("webrtc", "google")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [False], "use_h264": [True, False]}
-    default_options = {"shared": False, "use_h264": True}
+    options = {"shared": [False], "use_h264": [True, False], "use_rtti": [True, False]}
+    default_options = {"shared": False, "use_h264": True, "use_rtti": False}
     default_user = "acof"
     default_channel = "stable"
     no_copy_source = True # on windows we patch. but we patch in source()
@@ -168,15 +168,25 @@ class WebrtcConan(ConanFile):
             # pass
         return args
 
+    def _rtti(self):
+        if self.options.use_rtti:
+            return "use_rtti=true "
+        else:
+            return "use_rtti=false "
+
     def _create_linux_arguments(self):
+        args = ""
         with tools.chdir(self._webrtc_source):
             self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=amd64")
-            if self.settings.arch == "armv8":
-                self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64")
-            if self.settings.arch == "armv7":
-                self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm")
-        args = ""
-        args += "use_rtti=true "
+            sysroot=os.getenv('SYSROOT')
+            if sysroot:
+                args += f'target_sysroot=\\"{sysroot}\\" '
+            else:
+                if self.settings.arch == "armv8":
+                    self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm64")
+                if self.settings.arch == "armv7":
+                    self.run("./build/linux/sysroot_scripts/install-sysroot.py --arch=arm")
+        args += self._rtti()
         if self.settings.arch != "armv8" and self.settings.arch != "armv7":
             args += "use_sysroot=false "
         # compiler = self.settings.compiler
@@ -197,7 +207,8 @@ class WebrtcConan(ConanFile):
         return args
 
     def _create_macos_arguments(self):
-        args = "use_rtti=true "
+        args = ""
+        args += self._rtti()
         args += "use_sysroot=false "
         if tools.which('ccache'):
             args += 'cc_wrapper=\\"ccache\\" '
@@ -209,7 +220,7 @@ class WebrtcConan(ConanFile):
 
     def _create_ios_arguments(self):
         args = ""
-        args += "use_rtti=true "
+        args += self._rtti()
         # args += "use_sysroot=false "
         args += 'target_os=\\"ios\\" ios_enable_code_signing=false '
         # `enable_ios_bitcode` needs `use_xcode_clang=true`
@@ -271,6 +282,4 @@ class WebrtcConan(ConanFile):
             self.cpp_info.defines = ["WEBRTC_POSIX", "WEBRTC_IOS", "WEBRTC_MAC"]
         if self.options.use_h264:
             self.cpp_info.defines += ["WEBRTC_USE_H264"]
-
-
 

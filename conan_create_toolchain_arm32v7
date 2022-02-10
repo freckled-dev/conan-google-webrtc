@@ -1,0 +1,8 @@
+#!/bin/bash -ex
+
+cd "$(dirname "$0")"
+
+export CONAN_PRINT_RUN_COMMANDS=True
+export CONAN_SKIP_BROKEN_SYMLINKS_CHECK=True
+conan create conan_toolchains/linux_armv7/conanfile.py
+
