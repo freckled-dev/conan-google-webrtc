@@ -4,5 +4,5 @@ cd "$(dirname "$0")"
 
 export CONAN_PRINT_RUN_COMMANDS=True
 export CONAN_SKIP_BROKEN_SYMLINKS_CHECK=True
-conan create toolchains/linux_armv7/conanfile.py
+conan create toolchains/linux_arm64v8/conanfile.py
 

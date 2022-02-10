@@ -43,7 +43,7 @@ build ubuntu 18.04 gcc7:
     - conan create --profile ./profiles/gcc7_relwithdebinfo ./webrtc
   <<: *conan_upload
 
-build ubuntu 18.04 arm:
+.build ubuntu 18.04 arm:
   <<: *linux_build
   script:
     - conan create --profile ./profiles/linux_armv8_relwithdebinfo ./webrtc
